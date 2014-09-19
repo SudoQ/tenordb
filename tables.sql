@@ -1,4 +1,3 @@
-DROP DATABASE IF EXISTS tenordb;
 DROP TABLE IF EXISTS AbsNote,
 	RelNote,
 	Chord,
@@ -9,8 +8,6 @@ DROP TABLE IF EXISTS AbsNote,
 	ScaleNote,
 	ChordPatternNote,
 	ScalePatternNote;
-
-CREATE DATABASE tenordb;
 
 CREATE TABLE AbsNote (
 	id INTEGER PRIMARY KEY,
