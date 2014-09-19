@@ -23,7 +23,10 @@ func init() {
                 log.Fatalln("Cleaner: Database Connection Error: ", err)
         }
 		storerMap = make(map[string] goda.Storer)
-		storerMap["AbsNote"],_ = dba.Storer("AbsNote", tdb.AbsNote{})
+		storerMap["AbsNote"], err = dba.Storer("AbsNote", tdb.AbsNote{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["RelNote"],_ = dba.Storer("RelNote", tdb.RelNote{})
 		storerMap["Chord"],_ = dba.Storer("Chord", tdb.Chord{})
 		storerMap["Scale"],_ = dba.Storer("Scale", tdb.Scale{})
@@ -45,8 +48,11 @@ func init() {
 
 func main() {
 	// Gen AbsNotes
+	log.Println(storerMap)
+	/*
 	err := storerMap["AbsNote"].Store(tdb.AbsNote{Id: 0, Name: "C"})
 	if err != nil {
 		log.Println(err)
 	}
+	*/
 }
