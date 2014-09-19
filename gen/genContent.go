@@ -16,27 +16,25 @@ func init() {
                 log.Println("Connecting to Database...")
         }
         //Setup Database Connection
-        //log.Println(goda.LoadPGEnv())
         var err error
         dba, err = goda.NewDatabaseAdministrator(goda.LoadPGEnv())
         if err != nil {
                 log.Fatalln("Cleaner: Database Connection Error: ", err)
         }
 		storerMap = make(map[string] goda.Storer)
-		storerMap["AbsNote"], err = dba.Storer("AbsNote", tdb.AbsNote{})
+		storerMap["AbsNote"], err = dba.Storer("absnote", tdb.AbsNote{})
 		if err != nil {
 			panic(err)
 		}
-		storerMap["RelNote"],_ = dba.Storer("RelNote", tdb.RelNote{})
-		storerMap["Chord"],_ = dba.Storer("Chord", tdb.Chord{})
-		storerMap["Scale"],_ = dba.Storer("Scale", tdb.Scale{})
-		storerMap["ChordPattern"],_ = dba.Storer("ChordPattern", tdb.ChordPattern{})
-		storerMap["ScalePattern"],_ = dba.Storer("ScalePattern", tdb.ScalePattern{})
-		storerMap["ChordNote"],_ = dba.Storer("ChordNote", tdb.ChordNote{})
-		storerMap["ScaleNote"],_ = dba.Storer("ScaleNote", tdb.ScaleNote{})
-		storerMap["ChordPatternNote"],_ = dba.Storer("ChordPatternNote", tdb.ChordPatternNote{})
-		storerMap["ScalePatternNote"],_ = dba.Storer("ScalePatternNote", tdb.ScalePatternNote{})
-        //storer, err = dba.Storer("measurements", Measurements{})
+		storerMap["RelNote"],_ = dba.Storer("relnote", tdb.RelNote{})
+		storerMap["Chord"],_ = dba.Storer("chord", tdb.Chord{})
+		storerMap["Scale"],_ = dba.Storer("scale", tdb.Scale{})
+		storerMap["ChordPattern"],_ = dba.Storer("chordpattern", tdb.ChordPattern{})
+		storerMap["ScalePattern"],_ = dba.Storer("scalepattern", tdb.ScalePattern{})
+		storerMap["ChordNote"],_ = dba.Storer("chordnote", tdb.ChordNote{})
+		storerMap["ScaleNote"],_ = dba.Storer("scalenote", tdb.ScaleNote{})
+		storerMap["ChordPatternNote"],_ = dba.Storer("chordnatternnote", tdb.ChordPatternNote{})
+		storerMap["ScalePatternNote"],_ = dba.Storer("scalepatternnote", tdb.ScalePatternNote{})
         if err != nil {
                 panic(err)
         }
@@ -48,11 +46,15 @@ func init() {
 
 func main() {
 	// Gen AbsNotes
-	log.Println(storerMap)
-	/*
-	err := storerMap["AbsNote"].Store(tdb.AbsNote{Id: 0, Name: "C"})
-	if err != nil {
-		log.Println(err)
+	chrom := []string {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"}
+	for i, name := range chrom {
+		err := storerMap["AbsNote"].Store(tdb.AbsNote{Id: i, Name: name})
+		if err != nil {
+			log.Println(err)
+		}
+		err = storerMap["RelNote"].Store(tdb.RelNote{Id: i, Name: ""})
+		if err != nil {
+			log.Println(err)
+		}
 	}
-	*/
 }
