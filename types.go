@@ -16,10 +16,10 @@ type Chord struct {
 	Root_an_id int `db:root_an_id`
 }
 
-func NewChord(id, cp_id, root_an_id int) * Chord {
-	return &Chord {
-		Id: id,
-		Cp_id: cp_id,
+func NewChord(id, cp_id, root_an_id int) *Chord {
+	return &Chord{
+		Id:         id,
+		Cp_id:      cp_id,
 		Root_an_id: root_an_id,
 	}
 }
@@ -30,10 +30,10 @@ type Scale struct {
 	Root_an_id int `db:root_an_id`
 }
 
-func NewScale(id, sp_id, root_an_id int) * Scale {
-	return &Scale {
-		Id: id,
-		Sp_id: sp_id,
+func NewScale(id, sp_id, root_an_id int) *Scale {
+	return &Scale{
+		Id:         id,
+		Sp_id:      sp_id,
 		Root_an_id: root_an_id,
 	}
 }
@@ -43,9 +43,9 @@ type ChordPattern struct {
 	Name string `db:name`
 }
 
-func NewChordPattern(id int, name string) * ChordPattern {
-	return &ChordPattern {
-		Id: id,
+func NewChordPattern(id int, name string) *ChordPattern {
+	return &ChordPattern{
+		Id:   id,
 		Name: name,
 	}
 }
@@ -55,9 +55,9 @@ type ScalePattern struct {
 	Name string `db:name`
 }
 
-func NewScalePattern(id int, name string) * ScalePattern {
-	return &ScalePattern {
-		Id: id,
+func NewScalePattern(id int, name string) *ScalePattern {
+	return &ScalePattern{
+		Id:   id,
 		Name: name,
 	}
 }

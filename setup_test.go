@@ -1,8 +1,8 @@
 package tenordb
 
 import (
-	"testing"
 	"log"
+	"testing"
 )
 
 func TestSetup(t *testing.T) {
