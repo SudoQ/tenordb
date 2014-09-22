@@ -4,7 +4,6 @@ import (
 	"log"
 	"github.com/zephyyrr/goda"
 	"fmt"
-	tdb "github.com/SudoQ/tenordb"
 )
 
 var dba *goda.DatabaseAdministrator
@@ -20,22 +19,22 @@ func init() {
         var err error
         dba, err = goda.NewDatabaseAdministrator(goda.LoadPGEnv())
         if err != nil {
-                log.Fatalln("Cleaner: Database Connection Error: ", err)
+                log.Fatalln("TenorDB: Database Connection Error: ", err)
         }
 		storerMap = make(map[string] goda.Storer)
-		storerMap["AbsNote"], err = dba.Storer("absnote", tdb.AbsNote{})
+		storerMap["AbsNote"], err = dba.Storer("absnote", AbsNote{})
 		if err != nil {
 			panic(err)
 		}
-		storerMap["RelNote"],_ = dba.Storer("relnote", tdb.RelNote{})
-		storerMap["Chord"],_ = dba.Storer("chord", tdb.Chord{})
-		storerMap["Scale"],_ = dba.Storer("scale", tdb.Scale{})
-		storerMap["ChordPattern"],_ = dba.Storer("chordpattern", tdb.ChordPattern{})
-		storerMap["ScalePattern"],_ = dba.Storer("scalepattern", tdb.ScalePattern{})
-		storerMap["ChordNote"],_ = dba.Storer("chordnote", tdb.ChordNote{})
-		storerMap["ScaleNote"],_ = dba.Storer("scalenote", tdb.ScaleNote{})
-		storerMap["ChordPatternNote"],_ = dba.Storer("chordpatternnote", tdb.ChordPatternNote{})
-		storerMap["ScalePatternNote"],_ = dba.Storer("scalepatternnote", tdb.ScalePatternNote{})
+		storerMap["RelNote"],_ = dba.Storer("relnote", RelNote{})
+		storerMap["Chord"],_ = dba.Storer("chord", Chord{})
+		storerMap["Scale"],_ = dba.Storer("scale", Scale{})
+		storerMap["ChordPattern"],_ = dba.Storer("chordpattern", ChordPattern{})
+		storerMap["ScalePattern"],_ = dba.Storer("scalepattern", ScalePattern{})
+		storerMap["ChordNote"],_ = dba.Storer("chordnote", ChordNote{})
+		storerMap["ScaleNote"],_ = dba.Storer("scalenote", ScaleNote{})
+		storerMap["ChordPatternNote"],_ = dba.Storer("chordpatternnote", ChordPatternNote{})
+		storerMap["ScalePatternNote"],_ = dba.Storer("scalepatternnote", ScalePatternNote{})
         if err != nil {
                 panic(err)
         }
@@ -45,9 +44,9 @@ func init() {
         }
 }
 
-func Setup() {
-	var err error
 
+func deleteTables() {
+	var err error
 	tables := []string {
 		"chordnote",
 		"scalenote",
@@ -67,71 +66,93 @@ func Setup() {
 			log.Println(err)
 		}
 	}
+}
 
+func insertNotes() error {
 	// Gen Notes
+	var err error
 	chrom := []string {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"}
 	for i, name := range chrom {
-		err = storerMap["AbsNote"].Store(tdb.AbsNote{Id: i, Name: name})
+		err = storerMap["AbsNote"].Store(AbsNote{Id: i, Name: name})
 		if err != nil {
 			log.Println(err)
+			return err
 		}
 		// TODO Find some relevant name for relative notes, like "major third"...
-		err = storerMap["RelNote"].Store(tdb.RelNote{Id: i, Name: ""})
+		err = storerMap["RelNote"].Store(RelNote{Id: i, Name: ""})
 		if err != nil {
 			log.Println(err)
+			return err
 		}
 	}
+	return nil
+}
 
-	// GEN CHORDS
+func insertChordPatterns() error {
+	var err error
 
-	// Gen chord pattern notes, TODO Load from JSON config
-	cMajorNotes := [] * tdb.ChordPatternNote {
-		&tdb.ChordPatternNote{
-			Cp_id: 0,
-			Rn_id: 0,
-		},
-		&tdb.ChordPatternNote{
-			Cp_id: 0,
-			Rn_id: 4,
-		},
-		&tdb.ChordPatternNote{
-			Cp_id: 0,
-			Rn_id: 7,
-		},
-	}
+	// Fake JSON data
+	cp_id := 0
+	notes := []int {0,4,7}
 
 	// Create patterns
-	chordPatterns := []*tdb.ChordPattern {
-		tdb.NewChordPattern(0, "Major"),
+	chordPatterns := []*ChordPattern {
+		NewChordPattern(cp_id, "Major"),
 	}
 
-	// Create patternNotes
-
-	// Gen chord patterns, TODO Load from JSON config
 	err = storerMap["ChordPattern"].Store(chordPatterns[0])
 	if err != nil {
 		log.Println(err)
-		return
+		return err
 	}
 
-	for _, note := range(cMajorNotes){
+	patternNotes := make([]*ChordPatternNote, 0)
+
+	for _, note := range(notes){
+		patternNotes = append(patternNotes, &ChordPatternNote{
+			Cp_id: cp_id,
+			Rn_id: note,
+		})
+	}
+
+	for _, note := range(patternNotes){
 		err = storerMap["ChordPatternNote"].Store(note)
 		if err != nil {
 			log.Println(err)
-			return
+			return err
 		}
+	}
+	return nil
+}
+
+func Setup() error {
+	var err error
+
+	deleteTables()
+
+	err = insertNotes()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	err = insertChordPatterns()
+	if err != nil {
+		log.Println(err)
+		return err
 	}
 
 	rows, err := dba.Query("SELECT id, name FROM absnote;")
 	if err != nil {
 		log.Println(err)
-		return
+		return nil
 	}
 
-	absnotes := make([]*tdb.AbsNote, 0)
+	absnotes := make([]*AbsNote, 0)
 	for rows.Next() {
-		var an tdb.AbsNote
+		var an AbsNote
 		rows.Scan(&an.Id, &an.Name)
 		absnotes = append(absnotes, &an)
 	}
+	return nil
 }

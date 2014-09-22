@@ -4,6 +4,9 @@ import (
 	"testing"
 )
 
-func TestSetup(t *testing) {
-	Setup()
+func TestSetup(t *testing.T) {
+	err := Setup()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
