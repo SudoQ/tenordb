@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 )
 
-
 func insertChordPatterns() error {
 	var err error
 

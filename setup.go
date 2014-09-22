@@ -128,7 +128,7 @@ func loadJSON(filename string) (map[string]interface{}, error) {
 	return jsonMap, nil
 }
 
-func extractMap(jsonMap map[string]interface{}) (map[string][]int, error){
+func extractMap(jsonMap map[string]interface{}) (map[string][]int, error) {
 	resultMap := make(map[string][]int)
 	for _, jmValue := range jsonMap {
 		valueSlice := jmValue.([]interface{})
@@ -180,19 +180,19 @@ func Setup() error {
 		return err
 	}
 	/*
-	// Insert scale patterns into the database
-	err = insertScalePatterns()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
+		// Insert scale patterns into the database
+		err = insertScalePatterns()
+		if err != nil {
+			log.Println(err)
+			return err
+		}
 
-	// Insert scales into the database
-	err = insertChords()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
+		// Insert scales into the database
+		err = insertChords()
+		if err != nil {
+			log.Println(err)
+			return err
+		}
 	*/
 	return nil
 }
