@@ -4,6 +4,7 @@ import (
 	"log"
 	"github.com/zephyyrr/goda"
 	"fmt"
+	"io/ioutil"
 )
 
 var dba *goda.DatabaseAdministrator
@@ -149,6 +150,79 @@ func insertChordPatterns() error {
 	return nil
 }
 
+func insertChords() error {
+	// Fetch ChordPattern, ChordPatternNotes and AbsNotes from DB
+	var err error
+
+	data, err := ioutil.ReadFile("insertChords.sql")
+	if err != nil {
+		return err
+	}
+	query := string(data)
+	rows, err := dba.Query(query)
+	if err != nil {
+		return err
+	}
+	patternMap := make(map[int][]int)
+	patternNameMap := make(map[int]string)
+	for rows.Next() {
+		var cp_id, rn_id int
+		var cp_name string
+		rows.Scan(&cp_id, &cp_name, &rn_id)
+		if _, ok := patternMap[cp_id]; !ok {
+			patternMap[cp_id] = make([]int, 0)
+		}
+		patternMap[cp_id] = append(patternMap[cp_id], rn_id)
+		patternNameMap[cp_id] = cp_name
+	}
+
+	log.Println(patternMap)
+	log.Println(patternNameMap)
+
+	// Construct Chord and ChordNotes
+	chordId := 0
+	for cp_id, rn_ids := range(patternMap) {
+		// Find the root
+		for rootIndex := 0; rootIndex < 12; rootIndex++ {
+			chordNotes := make([]ChordNote, 0)
+			for _, rn_id := range(rn_ids) {
+				// Construct ChordNotes
+				cn := ChordNote{
+					An_id: (rn_id + rootIndex) % 12,
+					Rn_id: rn_id,
+					C_id: chordId,
+				}
+				chordNotes = append(chordNotes, cn)
+
+			}
+			chord := Chord {
+				Id: chordId,
+				Cp_id: cp_id,
+				Root_an_id: rootIndex,
+			}
+			log.Println(chord)
+			log.Println(chordNotes)
+			chordId++
+
+			// Save to database
+
+			err = storerMap["Chord"].Store(chord)
+			if err != nil {
+				return err
+			}
+			for _, note := range(chordNotes){
+				err = storerMap["ChordNote"].Store(note)
+				if err != nil {
+					return err
+				}
+			}
+
+		}
+	}
+
+	return nil
+}
+
 func Setup() error {
 	var err error
 
@@ -160,23 +234,18 @@ func Setup() error {
 		return err
 	}
 
+
 	err = insertChordPatterns()
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	rows, err := dba.Query("SELECT id, name FROM absnote;")
+	err = insertChords()
 	if err != nil {
 		log.Println(err)
-		return nil
+		return err
 	}
 
-	absnotes := make([]*AbsNote, 0)
-	for rows.Next() {
-		var an AbsNote
-		rows.Scan(&an.Id, &an.Name)
-		absnotes = append(absnotes, &an)
-	}
 	return nil
 }
