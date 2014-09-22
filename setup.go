@@ -106,7 +106,6 @@ func insertNotes() error {
 		// TODO Find some relevant name for relative notes, like "major third"...
 		err = storerMap["RelNote"].Store(RelNote{Id: i, Name: ""})
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 	}
@@ -131,7 +130,6 @@ func insertChordPatterns() error {
 
 		err = storerMap["ChordPattern"].Store(cp)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 
@@ -147,7 +145,6 @@ func insertChordPatterns() error {
 		for _, note := range patternNotes {
 			err = storerMap["ChordPatternNote"].Store(note)
 			if err != nil {
-				log.Println(err)
 				return err
 			}
 		}
@@ -182,9 +179,6 @@ func insertChords() error {
 		patternNameMap[cp_id] = cp_name
 	}
 
-	log.Println(patternMap)
-	log.Println(patternNameMap)
-
 	// Construct Chord and ChordNotes
 	chordId := 0
 	for cp_id, rn_ids := range patternMap {
@@ -206,8 +200,6 @@ func insertChords() error {
 				Cp_id:      cp_id,
 				Root_an_id: rootIndex,
 			}
-			log.Println(chord)
-			log.Println(chordNotes)
 			chordId++
 
 			// Save to database
@@ -244,7 +236,6 @@ func loadJSON() (map[string][]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println(jsonMap)
 
 	for _, jmValue := range jsonMap {
 		valueSlice := jmValue.([]interface{})
@@ -262,8 +253,6 @@ func loadJSON() (map[string][]int, error) {
 
 		}
 	}
-
-	log.Println(resultMap)
 
 	return resultMap, nil
 }
