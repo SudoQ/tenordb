@@ -113,6 +113,30 @@ func insertNotes() error {
 	return nil
 }
 
+func fetchPatternMapFromDB(filename string)(map[int][]int, error){
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	query := string(data)
+	rows, err := dba.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	patternMap := make(map[int][]int)
+	for rows.Next() {
+		var cp_id, rn_id int
+		var cp_name string
+		rows.Scan(&cp_id, &cp_name, &rn_id)
+		if _, ok := patternMap[cp_id]; !ok {
+			patternMap[cp_id] = make([]int, 0)
+		}
+		patternMap[cp_id] = append(patternMap[cp_id], rn_id)
+	}
+
+	return patternMap, nil
+}
+
 func loadJSON(filename string) (map[string]interface{}, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -147,6 +171,23 @@ func extractMap(jsonMap map[string]interface{}) (map[string][]int, error) {
 	}
 
 	return resultMap, nil
+}
+
+func loadPatternMap(filename string) (map[string][]int, error) {
+	var err error
+
+	jsonMap, err := loadJSON(filename)
+
+	if err != nil {
+		return nil, err
+	}
+
+	chordPatternMap, err := extractMap(jsonMap)
+
+	if err != nil {
+		return nil, err
+	}
+	return chordPatternMap, nil
 }
 
 func Setup() error {
