@@ -27,13 +27,37 @@ func init() {
 			panic(err)
 		}
 		storerMap["RelNote"],_ = dba.Storer("relnote", RelNote{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["Chord"],_ = dba.Storer("chord", Chord{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["Scale"],_ = dba.Storer("scale", Scale{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["ChordPattern"],_ = dba.Storer("chordpattern", ChordPattern{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["ScalePattern"],_ = dba.Storer("scalepattern", ScalePattern{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["ChordNote"],_ = dba.Storer("chordnote", ChordNote{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["ScaleNote"],_ = dba.Storer("scalenote", ScaleNote{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["ChordPatternNote"],_ = dba.Storer("chordpatternnote", ChordPatternNote{})
+		if err != nil {
+			panic(err)
+		}
 		storerMap["ScalePatternNote"],_ = dba.Storer("scalepatternnote", ScalePatternNote{})
         if err != nil {
                 panic(err)
