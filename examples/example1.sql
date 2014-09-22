@@ -26,7 +26,11 @@ WHERE cn.an_id IN (
 	JOIN
 	scalepattern as sp
 	ON scale.sp_id=sp.id
-	WHERE scale.root_an_id = 0 AND sp.name = 'major'
+	JOIN
+	absnote
+	ON
+	absnote.id = scale.root_an_id
+	WHERE absnote.name = 'C' AND sp.name = 'major'
 )
 GROUP BY chord.id, cp.name, absnote.name
 HAVING COUNT(cn.an_id) >= 3;
