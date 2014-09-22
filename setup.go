@@ -1,11 +1,11 @@
 package tenordb
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/zephyyrr/goda"
 	"io/ioutil"
 	"log"
-	"encoding/json"
 )
 
 var dba *goda.DatabaseAdministrator
@@ -123,9 +123,9 @@ func insertChordPatterns() error {
 
 	cp_id := 0
 
-	for patternName, notes := range(patternMap) {
+	for patternName, notes := range patternMap {
 		cp := ChordPattern{
-			Id: cp_id,
+			Id:   cp_id,
 			Name: patternName,
 		}
 
@@ -246,16 +246,16 @@ func loadJSON() (map[string][]int, error) {
 	}
 	log.Println(jsonMap)
 
-	for _, jmValue := range(jsonMap) {
+	for _, jmValue := range jsonMap {
 		valueSlice := jmValue.([]interface{})
-		for _, chordPatternMap := range(valueSlice){
+		for _, chordPatternMap := range valueSlice {
 
 			mapv := chordPatternMap.(map[string]interface{})
 
 			//resultMap[mapv["name"].(string)] = mapv["notes"].([]interface{})
 			patternName := mapv["name"].(string)
 			notes := make([]int, 0)
-			for _, mv := range(mapv["notes"].([]interface{})){
+			for _, mv := range mapv["notes"].([]interface{}) {
 				notes = append(notes, int(mv.(float64)))
 			}
 			resultMap[patternName] = notes
@@ -290,7 +290,6 @@ func Setup() error {
 		log.Println(err)
 		return err
 	}
-
 
 	return nil
 }
