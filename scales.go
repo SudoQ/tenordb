@@ -8,11 +8,11 @@ func insertScalePatterns() error {
 		return err
 	}
 
-	cp_id := 0
+	sp_id := 0
 
 	for patternName, notes := range patternMap {
 		cp := ScalePattern{
-			Id:   cp_id,
+			Id:   sp_id,
 			Name: patternName,
 		}
 
@@ -25,7 +25,7 @@ func insertScalePatterns() error {
 
 		for _, note := range notes {
 			patternNotes = append(patternNotes, ScalePatternNote{
-				Sp_id: cp_id,
+				Sp_id: sp_id,
 				Rn_id: note,
 			})
 		}
@@ -36,7 +36,7 @@ func insertScalePatterns() error {
 				return err
 			}
 		}
-		cp_id++
+		sp_id++
 	}
 	return nil
 }
@@ -49,7 +49,7 @@ func insertScales() error {
 
 	// Construct Scale and ScaleNotes
 	scaleId := 0
-	for cp_id, rn_ids := range patternMap {
+	for sp_id, rn_ids := range patternMap {
 		for rootIndex := 0; rootIndex < 12; rootIndex++ {
 			scaleNotes := make([]ScaleNote, 0)
 			for _, rn_id := range rn_ids {
@@ -64,7 +64,7 @@ func insertScales() error {
 			}
 			scale := Scale{
 				Id:         scaleId,
-				Sp_id:      cp_id,
+				Sp_id:      sp_id,
 				Root_an_id: rootIndex,
 			}
 			scaleId++
