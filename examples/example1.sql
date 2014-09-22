@@ -29,4 +29,4 @@ WHERE cn.an_id IN (
 	WHERE scale.root_an_id = 0 AND sp.name = 'major'
 )
 GROUP BY chord.id, cp.name, absnote.name
-HAVING COUNT(cn.an_id) = 3;
+HAVING COUNT(cn.an_id) >= 3;
