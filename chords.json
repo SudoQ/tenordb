@@ -1,0 +1,12 @@
+{
+	"chordpatterns": [
+		{
+			"name": "major",
+			"notes": [0, 4, 7]
+		},
+		{
+			"name": "minor",
+			"notes": [0, 3, 7]
+		}
+	]
+}

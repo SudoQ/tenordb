@@ -5,6 +5,7 @@ import (
 	"github.com/zephyyrr/goda"
 	"io/ioutil"
 	"log"
+	"encoding/json"
 )
 
 var dba *goda.DatabaseAdministrator
@@ -115,36 +116,42 @@ func insertNotes() error {
 func insertChordPatterns() error {
 	var err error
 
-	// Fake JSON data
-	cp_id := 0
-	notes := []int{0, 4, 7}
-
-	// Create patterns
-	chordPatterns := []*ChordPattern{
-		NewChordPattern(cp_id, "Major"),
-	}
-
-	err = storerMap["ChordPattern"].Store(chordPatterns[0])
+	patternMap, err := loadJSON()
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
-	patternNotes := make([]*ChordPatternNote, 0)
+	cp_id := 0
 
-	for _, note := range notes {
-		patternNotes = append(patternNotes, &ChordPatternNote{
-			Cp_id: cp_id,
-			Rn_id: note,
-		})
-	}
+	for patternName, notes := range(patternMap) {
+		cp := ChordPattern{
+			Id: cp_id,
+			Name: patternName,
+		}
 
-	for _, note := range patternNotes {
-		err = storerMap["ChordPatternNote"].Store(note)
+		err = storerMap["ChordPattern"].Store(cp)
 		if err != nil {
 			log.Println(err)
 			return err
 		}
+
+		patternNotes := make([]ChordPatternNote, 0)
+
+		for _, note := range notes {
+			patternNotes = append(patternNotes, ChordPatternNote{
+				Cp_id: cp_id,
+				Rn_id: note,
+			})
+		}
+
+		for _, note := range patternNotes {
+			err = storerMap["ChordPatternNote"].Store(note)
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+		}
+		cp_id++
 	}
 	return nil
 }
@@ -222,6 +229,45 @@ func insertChords() error {
 	return nil
 }
 
+func loadJSON() (map[string][]int, error) {
+	var err error
+
+	resultMap := make(map[string][]int)
+
+	data, err := ioutil.ReadFile("chords.json")
+	if err != nil {
+		return nil, err
+	}
+
+	jsonMap := make(map[string]interface{})
+	err = json.Unmarshal(data, &jsonMap)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(jsonMap)
+
+	for _, jmValue := range(jsonMap) {
+		valueSlice := jmValue.([]interface{})
+		for _, chordPatternMap := range(valueSlice){
+
+			mapv := chordPatternMap.(map[string]interface{})
+
+			//resultMap[mapv["name"].(string)] = mapv["notes"].([]interface{})
+			patternName := mapv["name"].(string)
+			notes := make([]int, 0)
+			for _, mv := range(mapv["notes"].([]interface{})){
+				notes = append(notes, int(mv.(float64)))
+			}
+			resultMap[patternName] = notes
+
+		}
+	}
+
+	log.Println(resultMap)
+
+	return resultMap, nil
+}
+
 func Setup() error {
 	var err error
 
@@ -244,6 +290,7 @@ func Setup() error {
 		log.Println(err)
 		return err
 	}
+
 
 	return nil
 }
