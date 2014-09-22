@@ -1,7 +1,7 @@
 SELECT
 absnote.name as rootName,
 cp.name as pattern,
-cn.an_id as an_id,
+cn.rn_id as rn_id,
 an_names.name as an_name
 FROM
 chord
