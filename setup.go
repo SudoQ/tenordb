@@ -220,20 +220,19 @@ func Setup() error {
 		log.Println(err)
 		return err
 	}
-	/*
-		// Insert scale patterns into the database
-		err = insertScalePatterns()
-		if err != nil {
-			log.Println(err)
-			return err
-		}
 
-		// Insert scales into the database
-		err = insertChords()
-		if err != nil {
-			log.Println(err)
-			return err
-		}
-	*/
+	// Insert scale patterns into the database
+	err = insertScalePatterns()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	// Insert scales into the database
+	err = insertChords()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	return nil
 }
