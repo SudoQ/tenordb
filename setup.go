@@ -70,7 +70,7 @@ func init() {
 	}
 }
 
-func deleteTables() {
+func deleteTables() error {
 	var err error
 	tables := []string{
 		"chordnote",
@@ -88,9 +88,10 @@ func deleteTables() {
 	for _, table := range tables {
 		_, err = dba.Query(fmt.Sprintf("DELETE FROM %s;", table))
 		if err != nil {
-			log.Println(err)
+			return err
 		}
 	}
+	return nil
 }
 
 func insertNotes() error {
@@ -112,121 +113,8 @@ func insertNotes() error {
 	return nil
 }
 
-func insertChordPatterns() error {
-	var err error
-
-	patternMap, err := loadJSON()
-	if err != nil {
-		return err
-	}
-
-	cp_id := 0
-
-	for patternName, notes := range patternMap {
-		cp := ChordPattern{
-			Id:   cp_id,
-			Name: patternName,
-		}
-
-		err = storerMap["ChordPattern"].Store(cp)
-		if err != nil {
-			return err
-		}
-
-		patternNotes := make([]ChordPatternNote, 0)
-
-		for _, note := range notes {
-			patternNotes = append(patternNotes, ChordPatternNote{
-				Cp_id: cp_id,
-				Rn_id: note,
-			})
-		}
-
-		for _, note := range patternNotes {
-			err = storerMap["ChordPatternNote"].Store(note)
-			if err != nil {
-				return err
-			}
-		}
-		cp_id++
-	}
-	return nil
-}
-
-func insertChords() error {
-	// Fetch ChordPattern, ChordPatternNotes and AbsNotes from DB
-	var err error
-
-	data, err := ioutil.ReadFile("insertChords.sql")
-	if err != nil {
-		return err
-	}
-	query := string(data)
-	rows, err := dba.Query(query)
-	if err != nil {
-		return err
-	}
-	patternMap := make(map[int][]int)
-	patternNameMap := make(map[int]string)
-	for rows.Next() {
-		var cp_id, rn_id int
-		var cp_name string
-		rows.Scan(&cp_id, &cp_name, &rn_id)
-		if _, ok := patternMap[cp_id]; !ok {
-			patternMap[cp_id] = make([]int, 0)
-		}
-		patternMap[cp_id] = append(patternMap[cp_id], rn_id)
-		patternNameMap[cp_id] = cp_name
-	}
-
-	// Construct Chord and ChordNotes
-	chordId := 0
-	for cp_id, rn_ids := range patternMap {
-		// Find the root
-		for rootIndex := 0; rootIndex < 12; rootIndex++ {
-			chordNotes := make([]ChordNote, 0)
-			for _, rn_id := range rn_ids {
-				// Construct ChordNotes
-				cn := ChordNote{
-					An_id: (rn_id + rootIndex) % 12,
-					Rn_id: rn_id,
-					C_id:  chordId,
-				}
-				chordNotes = append(chordNotes, cn)
-
-			}
-			chord := Chord{
-				Id:         chordId,
-				Cp_id:      cp_id,
-				Root_an_id: rootIndex,
-			}
-			chordId++
-
-			// Save to database
-
-			err = storerMap["Chord"].Store(chord)
-			if err != nil {
-				return err
-			}
-			for _, note := range chordNotes {
-				err = storerMap["ChordNote"].Store(note)
-				if err != nil {
-					return err
-				}
-			}
-
-		}
-	}
-
-	return nil
-}
-
-func loadJSON() (map[string][]int, error) {
-	var err error
-
-	resultMap := make(map[string][]int)
-
-	data, err := ioutil.ReadFile("chords.json")
+func loadJSON(filename string) (map[string]interface{}, error) {
+	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -237,13 +125,17 @@ func loadJSON() (map[string][]int, error) {
 		return nil, err
 	}
 
+	return jsonMap, nil
+}
+
+func extractMap(jsonMap map[string]interface{}) (map[string][]int, error){
+	resultMap := make(map[string][]int)
 	for _, jmValue := range jsonMap {
 		valueSlice := jmValue.([]interface{})
-		for _, chordPatternMap := range valueSlice {
+		for _, patternMap := range valueSlice {
 
-			mapv := chordPatternMap.(map[string]interface{})
+			mapv := patternMap.(map[string]interface{})
 
-			//resultMap[mapv["name"].(string)] = mapv["notes"].([]interface{})
 			patternName := mapv["name"].(string)
 			notes := make([]int, 0)
 			for _, mv := range mapv["notes"].([]interface{}) {
@@ -260,25 +152,47 @@ func loadJSON() (map[string][]int, error) {
 func Setup() error {
 	var err error
 
-	deleteTables()
+	// Delete old data
+	err = deleteTables()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
+	// Insert absolute and relative notes
 	err = insertNotes()
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
+	// Insert chord patterns into the database
 	err = insertChordPatterns()
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
+	// Insert chords into the database
 	err = insertChords()
 	if err != nil {
 		log.Println(err)
 		return err
 	}
+	/*
+	// Insert scale patterns into the database
+	err = insertScalePatterns()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
+	// Insert scales into the database
+	err = insertChords()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	*/
 	return nil
 }
