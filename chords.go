@@ -45,7 +45,7 @@ func insertChords() error {
 	// Fetch ChordPattern  and ChordPatternNotes from DB
 	var err error
 
-	patternMap, err := fetchPatternMapFromDB("insertChords.sql")
+	patternMap, err := fetchPatternMapFromDB("sql/insertChords.sql")
 
 	// Construct Chord and ChordNotes
 	chordId := 0

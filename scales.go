@@ -45,7 +45,7 @@ func insertScales() error {
 	// Fetch ScalePattern  and ScalePatternNotes from DB
 	var err error
 
-	patternMap, err := fetchPatternMapFromDB("insertScales.sql")
+	patternMap, err := fetchPatternMapFromDB("sql/insertScales.sql")
 
 	// Construct Scale and ScaleNotes
 	scaleId := 0
