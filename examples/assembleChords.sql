@@ -1,8 +1,8 @@
 SELECT
 rootnote.name as root,
 cp.name as pattern,
-match.count as precision,
-total.count as total
+total.count as chordsize,
+CAST(match.count AS FLOAT)/CAST(total.count AS FLOAT) as precision
 FROM (
 	SELECT
 	chord.id as c_id,
@@ -48,5 +48,6 @@ ON match.root_an_id = rootnote.id
 JOIN
 chordpattern as cp
 ON cp.id = match.cp_id
-ORDER BY match.count DESC, total.count ASC
+ORDER BY CAST(match.count AS FLOAT)/CAST(total.count AS FLOAT) DESC
+--ORDER BY match.count DESC, total.count ASC
 LIMIT 20;
