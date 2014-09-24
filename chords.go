@@ -3,7 +3,7 @@ package tenordb
 func insertChordPatterns() error {
 	var err error
 
-	patternMap, err := loadPatternMap("chords.json")
+	patternMap, err := loadPatternMap("config/chords.json")
 	if err != nil {
 		return err
 	}

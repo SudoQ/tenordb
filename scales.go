@@ -3,7 +3,7 @@ package tenordb
 func insertScalePatterns() error {
 	var err error
 
-	patternMap, err := loadPatternMap("scales.json")
+	patternMap, err := loadPatternMap("config/scales.json")
 	if err != nil {
 		return err
 	}
