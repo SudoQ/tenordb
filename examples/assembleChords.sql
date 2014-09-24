@@ -22,11 +22,13 @@ FROM (
 	JOIN absnote
 	ON absnote.id = cn.an_id
 	WHERE
+	-- BEGIN INPUT NOTES
 	absnote.name = 'C'
 	OR
 	absnote.name = 'E'
 	OR
 	absnote.name = 'G'
+	-- END INPUT NOTES
 	GROUP BY chord.id
 	HAVING COUNT(cn.an_id) = 3
 ) AS match
