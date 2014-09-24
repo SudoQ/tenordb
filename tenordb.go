@@ -113,7 +113,7 @@ func insertNotes() error {
 	return nil
 }
 
-func fetchPatternMapFromDB(filename string)(map[int][]int, error){
+func fetchPatternMapFromDB(filename string) (map[int][]int, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -238,7 +238,7 @@ func Setup() error {
 	return nil
 }
 
-func AssembleChord(notes []string) ([]string, error){
+func AssembleChord(notes []string) ([]string, error) {
 	if len(notes) == 0 {
 		return nil, nil
 	}
@@ -251,7 +251,7 @@ func AssembleChord(notes []string) ([]string, error){
 	tmpl := string(data)
 
 	s := ""
-	for _, note := range(notes[:(len(notes)-1)]){
+	for _, note := range notes[:(len(notes) - 1)] {
 		s += fmt.Sprintf("absnote.name = '%s' OR ", note)
 	}
 	s += fmt.Sprintf("absnote.name = '%s'\n", notes[len(notes)-1])
@@ -264,7 +264,7 @@ func AssembleChord(notes []string) ([]string, error){
 		return nil, err
 	}
 
-	for rows.Next(){
+	for rows.Next() {
 		var root, pattern string
 		var size int
 		var precision float64

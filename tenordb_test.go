@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-/*
 func TestSetup(t *testing.T) {
 	log.Println("Testing Setup...")
 	err := Setup()
@@ -15,7 +14,7 @@ func TestSetup(t *testing.T) {
 	}
 	log.Println("Done!")
 }
-*/
+
 func TestAssembleChord(t *testing.T) {
 	log.Println("TestAssembleChord")
 	notes := []string{"C", "E", "G"}
@@ -23,7 +22,7 @@ func TestAssembleChord(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, chord := range(chords) {
+	for _, chord := range chords {
 		log.Println(chord)
 	}
 }
