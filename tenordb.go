@@ -237,3 +237,40 @@ func Setup() error {
 
 	return nil
 }
+
+func AssembleChord(notes []string) ([]string, error){
+	if len(notes) == 0 {
+		return nil, nil
+	}
+
+	data, err := ioutil.ReadFile("tmpl/assembleChords.sql.tmpl")
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl := string(data)
+
+	s := ""
+	for _, note := range(notes[:(len(notes)-1)]){
+		s += fmt.Sprintf("absnote.name = '%s' OR ", note)
+	}
+	s += fmt.Sprintf("absnote.name = '%s'\n", notes[len(notes)-1])
+
+	result := make([]string, 0)
+
+	query := fmt.Sprintf(tmpl, s)
+	rows, err := dba.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next(){
+		var root, pattern string
+		var size int
+		var precision float64
+		rows.Scan(&root, &pattern, &size, &precision)
+		result = append(result, fmt.Sprintf("%s %s", root, pattern))
+	}
+
+	return result, nil
+}
