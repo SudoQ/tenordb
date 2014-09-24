@@ -1,7 +1,8 @@
 SELECT
 rootnote.name as root,
 cp.name as pattern,
-match.count as precision
+match.count as precision,
+total.count as total
 FROM (
 	SELECT
 	chord.id as c_id,
@@ -29,11 +30,23 @@ FROM (
 	GROUP BY chord.id
 	HAVING COUNT(cn.an_id) = 3
 ) AS match
+JOIN (
+	SELECT
+	chord.id as c_id,
+	COUNT(cn.an_id)
+	FROM
+	chord
+	JOIN
+	chordnote as cn
+	ON cn.c_id = chord.id
+	GROUP BY chord.id
+) as total
+ON total.c_id = match.c_id
 JOIN
 absnote as rootnote
 ON match.root_an_id = rootnote.id
 JOIN
 chordpattern as cp
 ON cp.id = match.cp_id
-ORDER BY match.count DESC
+ORDER BY match.count DESC, total.count ASC
 LIMIT 20;
