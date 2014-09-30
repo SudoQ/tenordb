@@ -22,7 +22,7 @@ FROM (
 	JOIN absnote
 	ON absnote.id = sn.an_id
 	WHERE
-	absnote.name = 'C' -- Prepared statement
+	absnote.name = $1 -- Prepared statement
 	GROUP BY scale.id
 	HAVING COUNT(sn.an_id) = 1
 ) AS match
