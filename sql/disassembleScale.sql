@@ -16,4 +16,4 @@ ON rootnote.id = scale.root_an_id
 JOIN
 scalepattern as sp
 ON sp.id = scale.sp_id
-WHERE rootnote.name = 'G' AND sp.name = 'minor_pentatonic';
+WHERE rootnote.name = $1 AND sp.name = $2; -- perpared statement
