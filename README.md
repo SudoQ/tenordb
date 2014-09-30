@@ -1,7 +1,7 @@
 TenorDB
 =======
 
-TenorDB is a simple music chord database.
+A simple music chord database.
 
 The goal of this project is to build a simple yet rich database of music chord related information.
 
