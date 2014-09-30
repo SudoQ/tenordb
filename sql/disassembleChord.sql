@@ -16,4 +16,4 @@ ON rootnote.id = chord.root_an_id
 JOIN
 chordpattern as cp
 ON cp.id = chord.cp_id
-WHERE rootnote.name = 'Bb' AND cp.name = '7';
+WHERE rootnote.name = $1 AND cp.name = $2; -- prepared statement
