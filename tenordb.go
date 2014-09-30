@@ -299,3 +299,37 @@ func AssembleScales(note string) ([]string, error) {
 
 	return result, nil
 }
+
+func DisassembleChord(note, pattern string) ([]string, error) {
+	result := make([]string, 0)
+
+	rows, err := disassembleChordStmt.Query(note, pattern)
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var noteId, noteName string
+		rows.Scan(&noteId, &noteName)
+		result = append(result, fmt.Sprintf("%s %s", noteId, noteName))
+	}
+
+	return result, nil
+}
+
+func DisassembleScale(note, pattern string) ([]string, error) {
+	result := make([]string, 0)
+
+	rows, err := disassembleScaleStmt.Query(note, pattern)
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var noteId, noteName string
+		rows.Scan(&noteId, &noteName)
+		result = append(result, fmt.Sprintf("%s %s", noteId, noteName))
+	}
+
+	return result, nil
+}

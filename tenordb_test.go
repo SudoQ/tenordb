@@ -22,8 +22,8 @@ func TestAssembleChords(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, chord := range chords {
-		log.Println(chord)
+	if len(chords) != 20 {
+		t.Fatal("The query did not return enough rows")
 	}
 }
 
@@ -34,7 +34,33 @@ func TestAssembleScales(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, scale := range scales {
-		log.Println(scale)
+	if len(scales) != 20 {
+		t.Fatal("The query did not return enough rows")
+	}
+}
+
+func TestDisassembleChord(t *testing.T) {
+	log.Println("TestDisassembleChord")
+	note := "Bb"
+	pattern := "7"
+	notes, err := DisassembleChord(note, pattern)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(notes) != 4 {
+		t.Fatal("The query did not return enough rows")
+	}
+}
+
+func TestDisassembleScale(t *testing.T) {
+	log.Println("TestDisassembleChord")
+	note := "G"
+	pattern := "minor_pentatonic"
+	notes, err := DisassembleScale(note, pattern)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(notes) != 5 {
+		t.Fatal("The query did not return enough rows")
 	}
 }
