@@ -26,3 +26,15 @@ func TestAssembleChords(t *testing.T) {
 		log.Println(chord)
 	}
 }
+
+func TestAssembleScales(t *testing.T) {
+	log.Println("TestAssembleScales")
+	note := "C"
+	scales, err := AssembleScales(note)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, scale := range scales {
+		log.Println(scale)
+	}
+}

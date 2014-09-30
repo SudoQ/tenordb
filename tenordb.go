@@ -15,14 +15,14 @@ var storerMap map[string]goda.Storer
 const (
 	// Queries
 	assembleChordsQuery   = "sql/assembleChords.sql"
-	//assembleScalesQuery   = "sql/assembleScales.sql"
+	assembleScalesQuery   = "sql/assembleScales.sql"
 	disassembleChordQuery = "sql/disassembleChord.sql"
 	disassembleScaleQuery = "sql/disassembleScale.sql"
 )
 
 var (
 	assembleChordsStmt   *sql.Stmt
-	//assembleScalesStmt   *sql.Stmt
+	assembleScalesStmt   *sql.Stmt
 	disassembleChordStmt *sql.Stmt
 	disassembleScaleStmt *sql.Stmt
 )
@@ -77,7 +77,7 @@ func init() {
 
 	files := map[string]**sql.Stmt{
 		assembleChordsQuery:   &assembleChordsStmt,
-		//assembleScalesQuery:   &assembleScalesStmt,
+		assembleScalesQuery:   &assembleScalesStmt,
 		disassembleChordQuery: &disassembleChordStmt,
 		disassembleScaleQuery: &disassembleScaleStmt,
 	}
@@ -266,6 +266,25 @@ func AssembleChords(note string) ([]string, error) {
 	result := make([]string, 0)
 
 	rows, err := assembleChordsStmt.Query(note)
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var root, pattern string
+		var size int
+		var precision float64
+		rows.Scan(&root, &pattern, &size, &precision)
+		result = append(result, fmt.Sprintf("%s %s", root, pattern))
+	}
+
+	return result, nil
+}
+
+func AssembleScales(note string) ([]string, error) {
+	result := make([]string, 0)
+
+	rows, err := assembleScalesStmt.Query(note)
 	if err != nil {
 		return result, err
 	}
