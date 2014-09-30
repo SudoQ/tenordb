@@ -1,6 +1,7 @@
 package tenordb
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/zephyyrr/goda"
@@ -11,13 +12,22 @@ import (
 var dba *goda.DatabaseAdministrator
 var storerMap map[string]goda.Storer
 
-var debugging = true
+const (
+	// Queries
+	assembleChordsQuery   = "sql/assembleChords.sql"
+	//assembleScalesQuery   = "sql/assembleScales.sql"
+	disassembleChordQuery = "sql/disassembleChord.sql"
+	disassembleScaleQuery = "sql/disassembleScale.sql"
+)
+
+var (
+	assembleChordsStmt   *sql.Stmt
+	//assembleScalesStmt   *sql.Stmt
+	disassembleChordStmt *sql.Stmt
+	disassembleScaleStmt *sql.Stmt
+)
 
 func init() {
-	if debugging {
-		log.Println("Connecting to Database...")
-	}
-	//Setup Database Connection
 	var err error
 	dba, err = goda.NewDatabaseAdministrator(goda.LoadPGEnv())
 	if err != nil {
@@ -28,45 +38,59 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	storerMap["RelNote"], _ = dba.Storer("relnote", RelNote{})
+	storerMap["RelNote"], err = dba.Storer("relnote", RelNote{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["Chord"], _ = dba.Storer("chord", Chord{})
+	storerMap["Chord"], err = dba.Storer("chord", Chord{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["Scale"], _ = dba.Storer("scale", Scale{})
+	storerMap["Scale"], err = dba.Storer("scale", Scale{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["ChordPattern"], _ = dba.Storer("chordpattern", ChordPattern{})
+	storerMap["ChordPattern"], err = dba.Storer("chordpattern", ChordPattern{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["ScalePattern"], _ = dba.Storer("scalepattern", ScalePattern{})
+	storerMap["ScalePattern"], err = dba.Storer("scalepattern", ScalePattern{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["ChordNote"], _ = dba.Storer("chordnote", ChordNote{})
+	storerMap["ChordNote"], err = dba.Storer("chordnote", ChordNote{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["ScaleNote"], _ = dba.Storer("scalenote", ScaleNote{})
+	storerMap["ScaleNote"], err = dba.Storer("scalenote", ScaleNote{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["ChordPatternNote"], _ = dba.Storer("chordpatternnote", ChordPatternNote{})
+	storerMap["ChordPatternNote"], err = dba.Storer("chordpatternnote", ChordPatternNote{})
 	if err != nil {
 		panic(err)
 	}
-	storerMap["ScalePatternNote"], _ = dba.Storer("scalepatternnote", ScalePatternNote{})
+	storerMap["ScalePatternNote"], err = dba.Storer("scalepatternnote", ScalePatternNote{})
 	if err != nil {
 		panic(err)
 	}
 
-	if debugging {
-		log.Println("Initialize Finished!")
+	files := map[string]**sql.Stmt{
+		assembleChordsQuery:   &assembleChordsStmt,
+		//assembleScalesQuery:   &assembleScalesStmt,
+		disassembleChordQuery: &disassembleChordStmt,
+		disassembleScaleQuery: &disassembleScaleStmt,
+	}
+
+	for file, stmt := range files {
+		query, err := ioutil.ReadFile(file)
+		if err != nil {
+			log.Fatalf("Failed to load %s: %s", file, err)
+		}
+		*stmt, err = dba.Prepare(string(query))
+		if err != nil {
+			log.Fatalf("Failed to prepare statement from %s: %s", file, err)
+		}
 	}
 }
 
@@ -166,7 +190,6 @@ func extractMap(jsonMap map[string]interface{}) (map[string][]int, error) {
 				notes = append(notes, int(mv.(float64)))
 			}
 			resultMap[patternName] = notes
-
 		}
 	}
 
@@ -192,6 +215,7 @@ func loadPatternMap(filename string) (map[string][]int, error) {
 
 func Setup() error {
 	var err error
+	return nil
 
 	// Delete old data
 	err = deleteTables()
@@ -238,30 +262,12 @@ func Setup() error {
 	return nil
 }
 
-func AssembleChord(notes []string) ([]string, error) {
-	if len(notes) == 0 {
-		return nil, nil
-	}
-
-	data, err := ioutil.ReadFile("tmpl/assembleChords.sql.tmpl")
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl := string(data)
-
-	s := ""
-	for _, note := range notes[:(len(notes) - 1)] {
-		s += fmt.Sprintf("absnote.name = '%s' OR ", note)
-	}
-	s += fmt.Sprintf("absnote.name = '%s'\n", notes[len(notes)-1])
-
+func AssembleChords(note string) ([]string, error) {
 	result := make([]string, 0)
 
-	query := fmt.Sprintf(tmpl, s)
-	rows, err := dba.Query(query)
+	rows, err := assembleChordsStmt.Query(note)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
 	for rows.Next() {

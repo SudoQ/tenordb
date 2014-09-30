@@ -15,10 +15,10 @@ func TestSetup(t *testing.T) {
 	log.Println("Done!")
 }
 
-func TestAssembleChord(t *testing.T) {
-	log.Println("TestAssembleChord")
-	notes := []string{"C", "E", "G"}
-	chords, err := AssembleChord(notes)
+func TestAssembleChords(t *testing.T) {
+	log.Println("TestAssembleChords")
+	note := "C"
+	chords, err := AssembleChords(note)
 	if err != nil {
 		t.Fatal(err)
 	}

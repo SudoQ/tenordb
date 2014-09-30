@@ -22,11 +22,9 @@ FROM (
 	JOIN absnote
 	ON absnote.id = cn.an_id
 	WHERE
-	-- BEGIN INPUT NOTES
-	%s
-	-- END INPUT NOTES
+	absnote.name = $1 -- Prepared statement
 	GROUP BY chord.id
-	HAVING COUNT(cn.an_id) = 3
+	HAVING COUNT(cn.an_id) = 1
 ) AS match
 JOIN (
 	SELECT
