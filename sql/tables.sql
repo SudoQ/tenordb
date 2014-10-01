@@ -1,0 +1,84 @@
+DROP TABLE IF EXISTS AbsNote,
+	RelNote,
+	Chord,
+	Scale,
+	ChordPattern,
+	ScalePattern,
+	ChordNote,
+	ScaleNote,
+	ChordPatternNote,
+	ScalePatternNote;
+
+CREATE TABLE AbsNote (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE RelNote (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE ChordPattern (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE ScalePattern (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE Chord (
+	id INTEGER PRIMARY KEY,
+	cp_id INTEGER REFERENCES ChordPattern(id) NOT NULL,
+	root_an_id INTEGER REFERENCES AbsNote(id) NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE Scale (
+	id INTEGER PRIMARY KEY,
+	sp_id INTEGER REFERENCES ScalePattern(id) NOT NULL,
+	root_an_id INTEGER REFERENCES AbsNote(id) NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE ChordNote (
+	an_id INTEGER REFERENCES AbsNote(id) NOT NULL,
+	rn_id INTEGER REFERENCES RelNote(id) NOT NULL,
+	c_id INTEGER REFERENCES Chord(id) NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE ScaleNote (
+	an_id INTEGER REFERENCES AbsNote(id) NOT NULL,
+	rn_id INTEGER REFERENCES RelNote(id) NOT NULL,
+	s_id INTEGER REFERENCES Scale(id) NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE ChordPatternNote (
+	cp_id INTEGER REFERENCES ChordPattern(id) NOT NULL,
+	rn_id INTEGER REFERENCES RelNote(id) NOT NULL
+) WITH (
+OIDS=FALSE
+);
+
+CREATE TABLE ScalePatternNote (
+	sp_id INTEGER REFERENCES ScalePattern(id) NOT NULL,
+	rn_id INTEGER REFERENCES RelNote(id) NOT NULL
+) WITH (
+OIDS=FALSE
+);
